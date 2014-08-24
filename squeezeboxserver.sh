@@ -1,0 +1,26 @@
+#!/bin/bash
+
+SQUEEZEBOX_STATE_DIR=/srv/squeezebox
+
+if ! [ -d "$SQUEEZEBOX_STATE_DIR" ]; then
+	echo "ERROR: missing state directory: $SQUEEZEBOX_STATE_DIR" >&2
+	exit 1
+fi
+
+SQUEEZEBOX_USER=squeezeboxserver
+SQUEEZEBOX_HOME="/usr/libexec"
+SQUEEZEBOX_CFG_DIR="$SQUEEZEBOX_STATE_DIR/prefs"
+SQUEEZEBOX_LOG_DIR="$SQUEEZEBOX_STATE_DIR/logs"
+SQUEEZEBOX_CACHE_DIR="$SQUEEZEBOX_STATE_DIR/cache"
+SQUEEZEBOX_CHARSET="utf8"
+SQUEEZEBOX_ARGS="--prefsdir=$SQUEEZEBOX_CFG_DIR --logdir=$SQUEEZEBOX_LOG_DIR --cachedir=$SQUEEZEBOX_CACHE_DIR --charset=$SQUEEZEBOX_CHARSET"
+SQUEEZEBOX_BIN="$SQUEEZEBOX_HOME/squeezeboxserver"
+export LANG="en_US.UTF-8"
+
+[ -f "$SQUEEZEBOX_STATE_DIR/squeezeboxserver.env" ] && . "$SQUEEZEBOX_STATE_DIR/squeezeboxserver.env"
+
+mkdir -p $SQUEEZEBOX_STATE_DIR/playlists
+
+chown -R $SQUEEZEBOX_USER $SQUEEZEBOX_STATE_DIR
+exec su -s /bin/bash $SQUEEZEBOX_USER -c "$SQUEEZEBOX_BIN $SQUEEZEBOX_ARGS"
+
